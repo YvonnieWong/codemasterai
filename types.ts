@@ -1,9 +1,16 @@
 
+export type QuizQuestionType = 'choice' | 'code';
+
 export interface QuizQuestion {
+  type: QuizQuestionType;
   question: string;
-  options: string[];
-  correctAnswerIndex: number;
   explanation: string;
+  // For 'choice' type
+  options?: string[];
+  correctAnswerIndex?: number;
+  // For 'code' type
+  starterCode?: string;
+  task?: string;
 }
 
 export interface LearningModule {
@@ -19,4 +26,10 @@ export enum AppStatus {
   LOADING = 'LOADING',
   SUCCESS = 'SUCCESS',
   ERROR = 'ERROR'
+}
+
+export interface CodeEvaluation {
+  isCorrect: boolean;
+  feedback: string;
+  score: number; // 0 to 100
 }

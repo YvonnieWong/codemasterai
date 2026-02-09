@@ -242,7 +242,11 @@ const App: React.FC = () => {
                   {activeTab === 'example' && <MarkdownContent content={learningModule.example} />}
                   {activeTab === 'quiz' && (
                     <div className="animate-in fade-in zoom-in-95 duration-300">
-                      <Quiz questions={learningModule.quiz} />
+                      <Quiz 
+                        questions={learningModule.quiz} 
+                        language={learningModule.language}
+                        contextCode={code}
+                      />
                     </div>
                   )}
                 </div>
