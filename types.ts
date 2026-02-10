@@ -11,6 +11,7 @@ export interface QuizQuestion {
   // For 'code' type
   starterCode?: string;
   task?: string;
+  solution?: string; // Canonical solution for code challenges
 }
 
 export interface LearningModule {

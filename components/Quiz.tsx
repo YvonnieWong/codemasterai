@@ -18,10 +18,10 @@ const Quiz: React.FC<QuizProps> = ({ questions, language, contextCode }) => {
   const [showFeedback, setShowFeedback] = useState(false);
   const [score, setScore] = useState(0);
   const [quizFinished, setQuizFinished] = useState(false);
+  const [revealSolution, setRevealSolution] = useState(false);
 
   const currentQuestion = questions[currentQuestionIndex];
 
-  // Initialize code for code questions
   useEffect(() => {
     if (currentQuestion.type === 'code' && currentQuestion.starterCode) {
       setUserCode(currentQuestion.starterCode);
@@ -65,6 +65,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, language, contextCode }) => {
       setUserCode('');
       setCodeFeedback(null);
       setShowFeedback(false);
+      setRevealSolution(false);
     } else {
       setQuizFinished(true);
     }
@@ -78,68 +79,72 @@ const Quiz: React.FC<QuizProps> = ({ questions, language, contextCode }) => {
     setShowFeedback(false);
     setScore(0);
     setQuizFinished(false);
+    setRevealSolution(false);
   };
 
   if (quizFinished) {
     return (
-      <div className="bg-slate-800 p-8 rounded-xl border border-slate-700 text-center">
-        <h3 className="text-2xl font-bold mb-4">Quiz Completed!</h3>
-        <p className="text-4xl font-bold text-blue-400 mb-2">{score} / {questions.length}</p>
-        <p className="text-slate-400 mb-6">
-          {score === questions.length ? "Perfect! You've mastered this concept." : "Good effort! Keep practicing."}
+      <div className="bg-black p-10 border-4 border-[#fcee0a] text-center">
+        <h3 className="text-3xl font-black mb-4 text-[#fcee0a] italic uppercase italic">EVALUATION_COMPLETE</h3>
+        <div className="text-6xl font-black text-[#00f0ff] mb-4 tracking-tighter">
+          {Math.round((score / questions.length) * 100)}%
+        </div>
+        <p className="text-slate-400 font-bold uppercase tracking-widest text-xs mb-8">
+          Synchronization Level: {score} of {questions.length} Nodes
         </p>
         <button 
           onClick={resetQuiz}
-          className="px-6 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg transition-colors font-medium"
+          className="cyber-button px-10 py-4"
         >
-          Try Again
+          REBOOT_SEQUENCE
         </button>
       </div>
     );
   }
 
+  const isCurrentAnswerCorrect = currentQuestion.type === 'choice' 
+    ? selectedOption === currentQuestion.correctAnswerIndex
+    : codeFeedback?.isCorrect;
+
   return (
-    <div className="bg-slate-800 p-6 md:p-8 rounded-xl border border-slate-700">
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex flex-col">
-          <span className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-1">
-            {currentQuestion.type === 'code' ? 'Code Challenge' : 'Multiple Choice'}
+    <div className="space-y-8">
+      <div className="flex justify-between items-end border-b-2 border-[#00f0ff]/20 pb-4">
+        <div>
+          <span className="text-[10px] font-black text-[#fcee0a] uppercase tracking-[0.4em] mb-1 block">
+            {currentQuestion.type === 'code' ? 'NEURAL_CONSTRUCT' : 'LOGIC_GATE'}
           </span>
-          <span className="text-sm font-medium text-slate-400">
-            Question {currentQuestionIndex + 1} of {questions.length}
-          </span>
+          <h3 className="text-sm font-bold text-slate-500 uppercase tracking-widest">
+            NODE {currentQuestionIndex + 1} / {questions.length}
+          </h3>
         </div>
-        <div className="h-1.5 w-32 bg-slate-700 rounded-full overflow-hidden">
+        <div className="h-4 w-40 bg-[#00f0ff]/10 border border-[#00f0ff]/30 p-0.5">
           <div 
-            className="h-full bg-blue-500 transition-all duration-300" 
+            className="h-full bg-[#00f0ff] shadow-[0_0_10px_rgba(0,240,255,0.8)] transition-all duration-700" 
             style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
           />
         </div>
       </div>
 
-      <h3 className="text-xl font-semibold mb-2">{currentQuestion.question}</h3>
-      {currentQuestion.type === 'code' && (
-        <p className="text-slate-400 text-sm mb-6 bg-slate-900/50 p-3 rounded-lg border border-slate-700/50 italic">
-          <strong>Task:</strong> {currentQuestion.task}
-        </p>
-      )}
+      <div className="space-y-2">
+        <h3 className="text-xl font-black text-white uppercase italic tracking-tighter">
+          {currentQuestion.question}
+        </h3>
+        {currentQuestion.type === 'code' && (
+          <div className="bg-[#00f0ff]/5 border-l-2 border-[#00f0ff] p-4 text-[11px] font-bold text-[#00f0ff] uppercase tracking-widest leading-loose">
+            TASK_PARAM: {currentQuestion.task}
+          </div>
+        )}
+      </div>
 
-      {/* Multiple Choice Layout */}
       {currentQuestion.type === 'choice' && (
-        <div className="space-y-3 mb-8 mt-6">
+        <div className="grid grid-cols-1 gap-4">
           {currentQuestion.options?.map((option, index) => {
-            let variant = "bg-slate-700 hover:bg-slate-600 border-slate-600";
-            if (selectedOption === index) {
-              variant = "bg-blue-900/30 border-blue-500 ring-1 ring-blue-500";
-            }
+            let style = "border-[#00f0ff]/20 bg-black text-slate-400 hover:border-[#00f0ff]/60 hover:text-white";
+            if (selectedOption === index) style = "border-[#fcee0a] bg-[#fcee0a]/10 text-[#fcee0a]";
             if (showFeedback) {
-              if (index === currentQuestion.correctAnswerIndex) {
-                variant = "bg-green-900/30 border-green-500 text-green-200";
-              } else if (selectedOption === index) {
-                variant = "bg-red-900/30 border-red-500 text-red-200";
-              } else {
-                variant = "bg-slate-700/50 border-slate-700 opacity-50";
-              }
+              if (index === currentQuestion.correctAnswerIndex) style = "border-[#00ff00] bg-[#00ff00]/10 text-[#00ff00]";
+              else if (selectedOption === index) style = "border-[#ff003c] bg-[#ff003c]/10 text-[#ff003c]";
+              else style = "border-[#00f0ff]/5 bg-black text-slate-700 opacity-40";
             }
 
             return (
@@ -147,13 +152,11 @@ const Quiz: React.FC<QuizProps> = ({ questions, language, contextCode }) => {
                 key={index}
                 onClick={() => handleOptionClick(index)}
                 disabled={showFeedback}
-                className={`w-full text-left p-4 rounded-lg border transition-all duration-200 ${variant}`}
+                className={`text-left p-5 border-2 transition-all group relative ${style}`}
               >
                 <div className="flex items-center">
-                  <span className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-800 border border-slate-600 mr-3 text-sm font-bold">
-                    {String.fromCharCode(65 + index)}
-                  </span>
-                  {option}
+                  <span className="font-black mr-4 text-xs opacity-50">[{index.toString().padStart(2, '0')}]</span>
+                  <span className="font-bold uppercase tracking-tight text-sm">{option}</span>
                 </div>
               </button>
             );
@@ -161,86 +164,74 @@ const Quiz: React.FC<QuizProps> = ({ questions, language, contextCode }) => {
         </div>
       )}
 
-      {/* Code Challenge Layout */}
       {currentQuestion.type === 'code' && (
-        <div className="mb-8 mt-4">
-          <div className="relative">
-            <div className="absolute top-0 right-0 p-2 text-xs text-slate-500 font-mono uppercase bg-slate-900/80 rounded-bl-lg border-l border-b border-slate-700">
-              {language} Editor
-            </div>
-            <textarea
-              value={userCode}
-              onChange={(e) => setUserCode(e.target.value)}
-              disabled={showFeedback || isEvaluating}
-              className="w-full h-48 bg-slate-900 text-slate-300 p-6 rounded-lg border border-slate-700 focus:ring-2 focus:ring-blue-500 outline-none code-font text-sm leading-relaxed"
-              spellCheck={false}
-            />
+        <div className="relative">
+          <div className="absolute top-0 right-0 p-2 text-[9px] text-[#00f0ff] font-mono uppercase z-10 bg-black/80 border-l border-b border-[#00f0ff]/30">
+            BUFFER_STREAM: {language}
           </div>
+          <textarea
+            value={userCode}
+            onChange={(e) => setUserCode(e.target.value)}
+            disabled={showFeedback || isEvaluating}
+            className="w-full h-64 bg-black text-[#00f0ff] p-6 border-2 border-[#00f0ff]/30 focus:border-[#fcee0a] outline-none code-font text-sm leading-relaxed"
+            spellCheck={false}
+          />
         </div>
       )}
 
       {showFeedback && (
-        <div className={`mb-8 p-4 rounded-lg border animate-in fade-in slide-in-from-top-2 duration-300 ${
-          (currentQuestion.type === 'choice' && selectedOption === currentQuestion.correctAnswerIndex) ||
-          (currentQuestion.type === 'code' && codeFeedback?.isCorrect)
-            ? 'bg-green-900/20 border-green-800/50' 
-            : 'bg-red-900/20 border-red-800/50'
+        <div className={`p-6 border-l-4 animate-in slide-in-from-left-4 duration-500 ${
+          isCurrentAnswerCorrect ? 'bg-[#00ff00]/5 border-[#00ff00]' : 'bg-[#ff003c]/5 border-[#ff003c]'
         }`}>
-          <div className="flex items-center space-x-2 mb-1">
-            <span className={`text-sm font-bold uppercase ${
-              (currentQuestion.type === 'choice' && selectedOption === currentQuestion.correctAnswerIndex) ||
-              (currentQuestion.type === 'code' && codeFeedback?.isCorrect)
-                ? 'text-green-400' : 'text-red-400'
-            }`}>
-              {(currentQuestion.type === 'choice' && selectedOption === currentQuestion.correctAnswerIndex) ||
-              (currentQuestion.type === 'code' && codeFeedback?.isCorrect)
-                ? 'Great Job!' : 'Keep Learning'}
+          <div className="flex items-center justify-between mb-4">
+            <span className={`text-xs font-black uppercase tracking-[0.3em] ${isCurrentAnswerCorrect ? 'text-[#00ff00]' : 'text-[#ff003c]'}`}>
+              {isCurrentAnswerCorrect ? 'SYNERGY_OPTIMAL' : 'CORE_CONFLICT_DETECTED'}
             </span>
             {currentQuestion.type === 'code' && codeFeedback && (
-              <span className="text-xs bg-slate-800 px-2 py-0.5 rounded border border-slate-700 text-slate-400">
-                AI Score: {codeFeedback.score}%
-              </span>
+              <span className="text-[10px] font-black text-slate-500">SYNC_VAL: {codeFeedback.score}%</span>
             )}
           </div>
-          <p className="text-sm text-slate-300 leading-relaxed">
-            {currentQuestion.type === 'choice' 
-              ? currentQuestion.explanation 
-              : codeFeedback?.feedback || currentQuestion.explanation}
+          <p className="text-xs font-bold text-slate-300 uppercase tracking-widest leading-loose">
+            {currentQuestion.type === 'choice' ? currentQuestion.explanation : codeFeedback?.feedback}
           </p>
+
+          {!isCurrentAnswerCorrect && currentQuestion.type === 'code' && currentQuestion.solution && (
+            <div className="mt-6">
+              {!revealSolution ? (
+                <button 
+                  onClick={() => setRevealSolution(true)}
+                  className="text-[10px] font-black text-[#fcee0a] hover:underline uppercase tracking-widest"
+                >
+                  [OVERRIDE_VIEW_CANONICAL_SOURCE]
+                </button>
+              ) : (
+                <div className="mt-4 space-y-2">
+                  <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">CANONICAL_SOURCE:</span>
+                  <pre className="p-4 bg-black/80 border border-[#fcee0a]/30 text-[#fcee0a]/80 code-font text-xs overflow-x-auto">
+                    {currentQuestion.solution}
+                  </pre>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
 
-      <div className="flex justify-end">
+      <div className="flex justify-end pt-6">
         {!showFeedback ? (
           <button
             onClick={handleSubmit}
-            disabled={
-              (currentQuestion.type === 'choice' && selectedOption === null) || 
-              (currentQuestion.type === 'code' && !userCode.trim()) ||
-              isEvaluating
-            }
-            className={`px-8 py-2 rounded-lg transition-colors font-medium flex items-center space-x-2 ${
-              isEvaluating ? 'bg-blue-800 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-500'
-            }`}
+            disabled={(currentQuestion.type === 'choice' && selectedOption === null) || (currentQuestion.type === 'code' && !userCode.trim()) || isEvaluating}
+            className={`cyber-button px-12 py-4 ${isEvaluating ? 'opacity-50 animate-pulse' : ''}`}
           >
-            {isEvaluating ? (
-              <>
-                <svg className="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <span>Evaluating...</span>
-              </>
-            ) : (
-              <span>Submit Answer</span>
-            )}
+            {isEvaluating ? 'PROCESSING...' : 'TRANSMIT'}
           </button>
         ) : (
           <button
             onClick={handleNext}
-            className="px-8 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg transition-colors font-medium"
+            className="cyber-button px-12 py-4"
           >
-            {currentQuestionIndex === questions.length - 1 ? 'Finish Quiz' : 'Next Question'}
+            {currentQuestionIndex === questions.length - 1 ? 'LOG_OUT' : 'NEXT_NODE'}
           </button>
         )}
       </div>

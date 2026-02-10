@@ -21,7 +21,7 @@ export async function generateLearningModule(code: string): Promise<LearningModu
     5. Create a 3-question quiz. 
        - At least one question must be a "choice" (multiple choice with 4 options).
        - At least one question must be a "code" (where the user writes a small code snippet to solve a task related to the input code).
-       - For "code" questions, provide a "starterCode" and a clear "task".
+       - For "code" questions, provide a "starterCode", a clear "task", and a "solution" (the correct code).
 
     Ensure all content is high-quality and uses Markdown for formatting.
   `;
@@ -52,7 +52,8 @@ export async function generateLearningModule(code: string): Promise<LearningModu
                   correctAnswerIndex: { type: Type.INTEGER },
                   // Fields for 'code'
                   starterCode: { type: Type.STRING },
-                  task: { type: Type.STRING }
+                  task: { type: Type.STRING },
+                  solution: { type: Type.STRING, description: "The correct code for the task." }
                 },
                 required: ["type", "question", "explanation"]
               }
